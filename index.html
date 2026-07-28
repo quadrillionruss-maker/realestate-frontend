@@ -13,12 +13,51 @@
   <link rel="stylesheet" href="./realestate.css">
 </head>
 <body>
-<div class="shell">
+
+<!-- ── THE FRONT DOOR ─────────────────────────────────────────────────
+     Composed as the almanac's title page: the same paper, rules and
+     serif as the dispatch behind it, so signing in is the first page of
+     the publication rather than a detour through a different product.
+     The token is typed onto a ruled writing line, not into a box. -->
+<main class="gate" id="gate">
+  <div class="gate-inner">
+    <div class="gate-mark reveal" style="--i:0">◆</div>
+    <div class="dateline reveal" id="gate-dateline" style="--i:1"></div>
+
+    <h1 class="gate-title reveal" style="--i:2">Sales <em>Operations</em></h1>
+    <div class="gate-rules reveal" style="--i:3"></div>
+
+    <p class="gate-blurb reveal" style="--i:4">
+      The morning brief for installment sales — who has fallen behind,
+      what is due this week, and the follow-ups already drafted.
+    </p>
+
+    <form class="gate-form reveal" id="gate-form" style="--i:5" autocomplete="off" novalidate>
+      <label class="gate-label" for="token-input">Access token</label>
+
+      <div class="gate-line" id="gate-line">
+        <input id="token-input" class="gate-input" type="password" required
+               spellcheck="false" autocapitalize="off" autocorrect="off"
+               autocomplete="off" placeholder="Paste your bearer token">
+        <button class="gate-submit" id="gate-submit" type="submit">Enter</button>
+      </div>
+
+      <p class="gate-status" id="gate-status" role="status" aria-live="polite"></p>
+
+      <p class="gate-hint">
+        Mint one with <code>npm run token -- &lt;user-id&gt;</code>.
+        Kept in memory only and never written to disk, so a refresh asks again.
+      </p>
+    </form>
+  </div>
+</main>
+
+<div class="shell" id="app" hidden>
 
   <header class="masthead">
     <div class="masthead-top">
-      <a class="back-link" href="./index.html">← FlowDesk</a>
       <div class="dateline" id="dateline"></div>
+      <button class="back-link" id="btn-signout" type="button">Sign out</button>
     </div>
     <h1 class="wordmark">Sales <em>Operations</em></h1>
     <div class="masthead-rules"></div>

@@ -1,16 +1,25 @@
 // realestate.js — Sales Operations dashboard.
 //
-// Plain script, no bundler: FlowDesk's frontend is static HTML served as-is
-// (index.html, portal.html), so this page follows the same rule and reads the
-// same session the rest of the app uses — localStorage 'fd_token'.
+// Plain script, no bundler: the page is static HTML served as-is.
+//
+// AUTH: the bearer token lives in a variable in this closure and nowhere else.
+// Not localStorage, not sessionStorage, not a cookie — nothing on disk for a
+// stray script to read, and nothing left behind on a shared machine. The cost
+// is that a refresh asks again, which the gate says plainly.
 
 (function () {
   'use strict';
 
-  // Same resolution order as index.html, so one deploy-time global configures
-  // every page.
+  // Set window.__API_BASE__ at deploy time to point the page at its API.
   var API_BASE = window.__API_BASE__ || 'http://localhost:4000/api';
-  var TOKEN_KEY = 'fd_token';
+
+  // The whole session. Never persisted.
+  var token = null;
+
+  // Tracks whether the dashboard is currently shown, so a 401 mid-session
+  // sends the user back to the gate while a 401 during sign-in does not
+  // recurse into it.
+  var authenticated = false;
 
   // ── Helpers ───────────────────────────────────────────────────────────
   function esc(value) {
@@ -38,30 +47,48 @@
   function clearError() { el('error-notice').hidden = true; }
 
   // ── API ───────────────────────────────────────────────────────────────
+  // Thrown errors carry `status` so callers can tell "your token is wrong"
+  // from "the server is down" — the gate shows different messages for each.
   async function api(path, options) {
-    var token = localStorage.getItem(TOKEN_KEY);
-    var res = await fetch(API_BASE + '/re' + path, Object.assign({}, options, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: token ? 'Bearer ' + token : '',
-      },
-    }));
+    var res;
+    try {
+      res = await fetch(API_BASE + '/re' + path, Object.assign({}, options, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: token ? 'Bearer ' + token : '',
+        },
+      }));
+    } catch (networkError) {
+      throw Object.assign(new Error('Could not reach the API at ' + API_BASE), { status: 0 });
+    }
 
     if (res.status === 401) {
-      // Session gone: hand back to the app shell, which owns the login screen.
-      window.location.href = './index.html';
-      throw new Error('Session expired.');
+      // Never redirect. This page IS the login screen, so navigating to it on
+      // a 401 is an infinite reload — the bug this gate replaced. Fall back to
+      // the gate in place instead.
+      var expired = Object.assign(new Error('Session expired. Sign in again.'), { status: 401 });
+      if (authenticated) lockOut(expired.message);
+      throw expired;
     }
 
     var body = await res.json().catch(function () { return {}; });
-    if (!res.ok) throw new Error(body.error || 'Request failed (' + res.status + ')');
+    if (!res.ok) {
+      throw Object.assign(
+        new Error(body.error || 'Request failed (' + res.status + ')'),
+        { status: res.status }
+      );
+    }
     return body;
   }
 
   // ── Renderers ─────────────────────────────────────────────────────────
   function renderDateline() {
-    el('dateline').textContent = new Date().toLocaleDateString('en-NG', {
+    var today = new Date().toLocaleDateString('en-NG', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+    });
+    ['dateline', 'gate-dateline'].forEach(function (id) {
+      var node = el(id);
+      if (node) node.textContent = today;
     });
   }
 
@@ -311,9 +338,98 @@
     }
   });
 
-  if (!localStorage.getItem(TOKEN_KEY)) {
-    window.location.href = './index.html';
-  } else {
-    load();
+  // ── The gate ──────────────────────────────────────────────────────────
+  // The dashboard is not rendered — not even hidden behind CSS — until a
+  // token has actually been accepted by the API. "Looks logged in" and "is
+  // logged in" are the same state here.
+  function unlock() {
+    authenticated = true;
+    var gate = el('gate');
+    var app = el('app');
+
+    gate.classList.add('is-leaving');
+    window.setTimeout(function () {
+      gate.hidden = true;
+      app.hidden = false;
+      app.classList.add('app-enter');
+      var refresh = el('btn-refresh-brief');
+      if (refresh) refresh.focus({ preventScroll: true });
+    }, 280);
   }
+
+  function lockOut(message) {
+    authenticated = false;
+    token = null;
+
+    var gate = el('gate');
+    el('app').hidden = true;
+    gate.hidden = false;
+    gate.classList.remove('is-leaving');
+
+    setStatus(message || '', message ? 'error' : '');
+    el('gate-line').classList.toggle('is-error', Boolean(message));
+    el('token-input').value = '';
+    el('token-input').focus();
+  }
+
+  function setStatus(message, kind) {
+    var status = el('gate-status');
+    status.textContent = message;
+    status.className = 'gate-status'
+      + (kind === 'working' ? ' is-working' : kind === 'ok' ? ' is-ok' : '');
+  }
+
+  el('gate-form').addEventListener('submit', async function (event) {
+    event.preventDefault();
+
+    var input = el('token-input');
+    var submit = el('gate-submit');
+    var candidate = input.value.trim();
+
+    el('gate-line').classList.remove('is-error');
+
+    if (!candidate) {
+      setStatus('Paste a token to continue.', 'error');
+      el('gate-line').classList.add('is-error');
+      input.focus();
+      return;
+    }
+
+    submit.disabled = true;
+    input.disabled = true;
+    setStatus('Verifying…', 'working');
+
+    // Hold the candidate in `token` only for the length of this check, so a
+    // rejected token never lingers as the session.
+    token = candidate;
+    try {
+      await api('/dashboard');
+      setStatus('Verified.', 'ok');
+      input.value = '';
+      unlock();
+      load();
+    } catch (err) {
+      token = null;
+      el('gate-line').classList.add('is-error');
+      setStatus(
+        err.status === 401 ? 'That token was rejected. Check it and try again.'
+          : err.status === 0 ? err.message
+          : err.message,
+        'error'
+      );
+      input.focus();
+      input.select();
+    } finally {
+      submit.disabled = false;
+      input.disabled = false;
+    }
+  });
+
+  el('btn-signout').addEventListener('click', function () {
+    lockOut('Signed out.');
+    setStatus('Signed out.', '');
+    el('gate-line').classList.remove('is-error');
+  });
+
+  el('token-input').focus();
 })();
