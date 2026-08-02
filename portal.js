@@ -80,6 +80,16 @@
     return (n < 0 ? '-' : '') + '₦' + Math.abs(n).toLocaleString('en-NG', { maximumFractionDigits: 0 });
   }
 
+  // URLs from the API that this page navigates to or renders — the Paystack
+  // checkout and signed document downloads. Only plain http(s) passes; a
+  // `javascript:` URL assigned to window.location would run as script, and
+  // returning '' turns that into a visible error instead.
+  function safeUrl(value) {
+    return /^https?:\/\//i.test(String(value == null ? '' : value).trim())
+      ? String(value).trim()
+      : '';
+  }
+
   function fmtDate(value) {
     if (!value) return '—';
     var d = new Date(value);
@@ -425,6 +435,11 @@
           var scheduleId = button.dataset.schedule;
           var result = await initiatePay(scheduleId);
 
+          var payUrl = safeUrl(result.authorization_url);
+          if (!payUrl) {
+            throw new Error('The payment page could not be opened. Please try again or contact the sales office.');
+          }
+
           // Remembered before leaving, so the "confirming" state survives even
           // if Paystack drops the ?paid= parameter on the way back.
           session(PAID_KEY, scheduleId);
@@ -432,7 +447,7 @@
           // Same tab, not a popup: a blocker eating the payment window is the
           // most common way an online payment quietly fails to happen. The
           // return trip is handled by the token in sessionStorage.
-          window.location.href = result.authorization_url;
+          window.location.href = payUrl;
         } catch (err) {
           toast(err.message, 'err');
           button.disabled = false;
@@ -447,12 +462,16 @@
         button.classList.add('is-working');
         try {
           var result = await api('/documents/' + button.dataset.doc + '/download');
+          var downloadUrl = safeUrl(result.download_url);
+          if (!downloadUrl) {
+            throw new Error('That document could not be opened. Please try again or contact the sales office.');
+          }
           // An anchor click, not window.open. Mobile popup blockers are on by
           // default and drop window.open when the call is an await away from
           // the tap — which this one is, because the signed URL has to be
           // fetched first. The buyer would tap Download and see nothing.
           var a = document.createElement('a');
-          a.href = result.download_url;
+          a.href = downloadUrl;
           a.target = '_blank';
           a.rel = 'noopener';
           document.body.appendChild(a);

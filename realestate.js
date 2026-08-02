@@ -67,6 +67,18 @@
     });
   }
 
+  // For URLs that came from the API and land in an href, an img src, or a
+  // window.location — media files, logos, signed download links, Paystack.
+  // esc() stops a value breaking out of the attribute, but it does not stop
+  // the URL itself being a `javascript:` one, which is a live script the
+  // moment somebody clicks it. Anything that is not plain http(s) becomes ''
+  // — an inert link beats a clickable payload.
+  function safeUrl(value) {
+    return /^https?:\/\//i.test(String(value == null ? '' : value).trim())
+      ? String(value).trim()
+      : '';
+  }
+
   // Sign goes before the symbol — "-₦5,000", not "₦-5,000", which reads as a
   // rendering glitch rather than a negative amount.
   function naira(amount) {
@@ -197,8 +209,16 @@
   }
 
   function openFile(url, filename) {
+    // Signed download URLs come from the API; blob: comes from downloadCsv
+    // above. Nothing else — assigning an unchecked URL to an anchor and
+    // clicking it is the same trust decision as window.location.
+    var target = String(url == null ? '' : url).trim();
+    if (!/^(https?:\/\/|blob:)/i.test(target)) {
+      toast('That file could not be opened.', 'err');
+      return;
+    }
     var a = document.createElement('a');
-    a.href = url;
+    a.href = target;
     a.target = '_blank';
     a.rel = 'noopener';
     if (filename) a.download = filename;
@@ -860,10 +880,10 @@
         });
         var ok = el('verify-ok');
         ok.textContent = result.message || 'Sent.';
-        if (result.dev_url) {
+        if (safeUrl(result.dev_url)) {
           ok.innerHTML = esc(result.message) +
             '<br><br><b>Email is not configured on this server.</b><br>' +
-            '<a class="link-quiet" href="' + esc(result.dev_url) + '">Open the confirmation link</a>';
+            '<a class="link-quiet" href="' + esc(safeUrl(result.dev_url)) + '">Open the confirmation link</a>';
         }
         ok.classList.remove('hidden');
         el('verify-error').classList.add('hidden');
@@ -966,10 +986,10 @@
 
         // Only ever present outside production, and only when email is not
         // configured — otherwise the reset flow is untestable locally.
-        if (result.dev_reset_url) {
+        if (safeUrl(result.dev_reset_url)) {
           ok.innerHTML = esc(result.message) +
             '<br><br><b>Email is not configured on this server.</b><br>' +
-            '<a class="link-quiet" href="' + esc(result.dev_reset_url) + '">Open the reset link</a>';
+            '<a class="link-quiet" href="' + esc(safeUrl(result.dev_reset_url)) + '">Open the reset link</a>';
         }
       } catch (err) {
         gateError('forgot-error', err.message);
@@ -1420,6 +1440,7 @@
     adoptToken: setToken,
 
     esc: esc,
+    safeUrl: safeUrl,
     naira: naira,
     nairaShort: nairaShort,
     plural: plural,

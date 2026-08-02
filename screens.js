@@ -1065,10 +1065,11 @@
         (media.length
           ? '<div class="grid cols-3 mb-2">' + media.map(function (m) {
               var isPdf = /\.pdf$/i.test(m.url);
-              return '<a class="card" style="text-decoration:none;overflow:hidden" href="' + esc(m.url) + '" target="_blank" rel="noopener">' +
+              var mediaUrl = R.safeUrl(m.url);
+              return '<a class="card" style="text-decoration:none;overflow:hidden" href="' + esc(mediaUrl) + '" target="_blank" rel="noopener">' +
                 (isPdf
                   ? '<div style="height:96px;display:grid;place-items:center;background:var(--panel-2);font-size:22px;opacity:.4">▤</div>'
-                  : '<img src="' + esc(m.url) + '" alt="' + esc(m.label || m.kind) + '" style="width:100%;height:96px;object-fit:cover;display:block">') +
+                  : '<img src="' + esc(mediaUrl) + '" alt="' + esc(m.label || m.kind) + '" style="width:100%;height:96px;object-fit:cover;display:block">') +
                 '<div class="card-body" style="padding:9px 11px">' +
                   '<div style="font-size:12px">' + esc(m.label || String(m.kind).replace(/_/g, ' ')) + '</div>' +
                   '<div class="cell-meta">' + esc(fmtDate(m.uploaded_at)) + '</div>' +
@@ -3209,7 +3210,7 @@
           '<div class="logo-upload" id="logo-upload" tabindex="0" role="button" ' +
               'aria-label="' + (logoUrl ? 'Change workspace logo' : 'Add workspace logo') + '">' +
             (logoUrl
-              ? '<img src="' + esc(logoUrl) + '" alt="Workspace logo">'
+              ? '<img src="' + esc(R.safeUrl(logoUrl)) + '" alt="Workspace logo">'
               : '<div class="logo-upload-empty">Add logo</div>') +
             '<div class="logo-upload-overlay">' + (logoUrl ? 'Change' : 'Add logo') + '</div>' +
           '</div>' +
