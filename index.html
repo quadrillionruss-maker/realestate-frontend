@@ -146,8 +146,11 @@
         <div class="field">
           <label for="reg-password">Password</label>
           <input class="input" id="reg-password" type="password" required autocomplete="new-password"
-                 placeholder="At least 8 characters">
-          <p class="field-hint">Minimum 8 characters. Longer beats complicated.</p>
+                 placeholder="At least 12 characters">
+          <!-- Must match authService.MIN_PASSWORD_LENGTH. The server rejects
+               anything shorter, so a lower number here is not a gentler rule —
+               it is a form that tells you 8 is fine and then refuses it. -->
+          <p class="field-hint">Minimum 12 characters. Longer beats complicated.</p>
         </div>
 
         <p class="field-error hidden" id="reg-error" role="alert"></p>
@@ -207,7 +210,7 @@
         <div class="field">
           <label for="reset-password">New password</label>
           <input class="input" id="reset-password" type="password" required autocomplete="new-password"
-                 placeholder="At least 8 characters">
+                 placeholder="At least 12 characters">
         </div>
 
         <p class="field-error hidden" id="reset-error" role="alert"></p>
