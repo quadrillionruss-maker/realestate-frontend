@@ -854,7 +854,50 @@
     node.classList.toggle('hidden', !message);
   }
 
+  // ── Gate theme (light / dark) ─────────────────────────────────────────────
+  // The sign-in screen carries its own light and dark palettes, independent of
+  // the app, which is always dark. Precedence: a choice the visitor has made
+  // before (localStorage) wins; failing that, their operating-system setting;
+  // failing THAT, dark, because it matches the dashboard they are heading into.
+  //
+  // Only an explicit toggle is persisted. Someone who has never touched the
+  // button keeps following their OS theme as it changes through the day rather
+  // than being pinned to whatever it happened to be on their first visit.
+  var THEME_KEY = 'archta.gate.theme';
+
+  function preferredTheme() {
+    var saved;
+    try { saved = window.localStorage.getItem(THEME_KEY); } catch (e) { saved = null; }
+    if (saved === 'light' || saved === 'dark') return saved;
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) return 'light';
+    return 'dark';
+  }
+
+  function applyGateTheme(theme) {
+    el('gate').setAttribute('data-theme', theme);
+  }
+
+  function wireThemeToggle() {
+    applyGateTheme(preferredTheme());
+
+    el('gate-theme-toggle').addEventListener('click', function () {
+      var next = el('gate').getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyGateTheme(next);
+      try { window.localStorage.setItem(THEME_KEY, next); } catch (e) { /* private mode: this tab still switches, it just will not remember */ }
+    });
+
+    // Follow the OS while the visitor has expressed no preference of their own.
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function () {
+        var saved;
+        try { saved = window.localStorage.getItem(THEME_KEY); } catch (e) { saved = null; }
+        if (saved !== 'light' && saved !== 'dark') applyGateTheme(preferredTheme());
+      });
+    }
+  }
+
   function wireGate() {
+    wireThemeToggle();
     el('link-to-register').addEventListener('click', function () { showGateForm('form-register'); });
     el('link-to-login').addEventListener('click', function () { showGateForm('form-login'); });
     el('link-forgot').addEventListener('click', function () { showGateForm('form-forgot'); });

@@ -51,10 +51,33 @@
      terminal. There was no way to create an account, no way to reset a
      password, and no way to sign in from a second device. `npm run token`
      still exists — it is a debugging tool now, not the only way in. -->
-<main class="gate" id="gate" hidden>
+<!-- data-theme is the switch the whole gate reads. It defaults to "dark" here
+     so there is never an unstyled first paint; realestate.js corrects it to the
+     visitor's saved choice, or their device setting, before the gate is shown.
+     Every palette token and both veils are scoped to [data-theme] in the CSS,
+     so flipping this one attribute re-themes the entire sign-in screen. The app
+     behind it is unaffected — these tokens live on .gate, not :root. -->
+<main class="gate" id="gate" data-theme="dark" hidden>
+
+  <!-- Light / dark toggle, top-right. Shows the icon of the mode you would
+       switch INTO — a sun while dark, a moon while light — which is the
+       convention people read fastest. -->
+  <button class="gate-theme-toggle" id="gate-theme-toggle" type="button"
+          aria-label="Switch colour theme">
+    <svg class="tt-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="2" stroke-linecap="round" aria-hidden="true">
+      <circle cx="12" cy="12" r="4.2"/>
+      <path d="M12 2.5v2.4M12 19.1v2.4M4.6 4.6l1.7 1.7M17.7 17.7l1.7 1.7M2.5 12h2.4M19.1 12h2.4M4.6 19.4l1.7-1.7M17.7 6.3l1.7-1.7"/>
+    </svg>
+    <svg class="tt-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M20 14.2A8 8 0 0 1 9.8 4 8 8 0 1 0 20 14.2Z"/>
+    </svg>
+  </button>
 
   <!-- ── The field ─────────────────────────────────────────────────────────
-       A photograph of a Nigerian estate, veiled almost to white.
+       A photograph of a Nigerian estate, veiled to a ghost — white in light
+       mode, near-black in dark. Same photo, same blur, only the veil colour
+       changes between themes.
 
        An earlier pass replaced a video of a city with abstract isometric
        geometry on the argument that a picture of buildings is the literal
@@ -74,9 +97,9 @@
     <!-- Wordmark, then the one line that says what this is. The h1 is here
          because it is now the only heading on the first screen — the display
          headline it used to share the page with is gone. -->
-    <h1 class="gate-topmark">
-      ARCHTA<i aria-hidden="true"></i>
-    </h1>
+    <!-- No full stop. The wordmark is the word — the box that used to sit after
+         it is gone, matching the supplied logo. -->
+    <h1 class="gate-topmark">ARCHTA</h1>
 
     <p class="gate-lede">Installment sales, allocations and collections for property developers.</p>
 

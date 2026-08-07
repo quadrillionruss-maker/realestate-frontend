@@ -265,17 +265,30 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
    Order matters in the shorthand: CSS paints background layers FIRST-listed on
    top, so the warm glow sits over the charcoal one, and the flat colour goes
    last because it is the ground everything else lies on. */
+/* ── Structure, shared by both themes ──────────────────────────────────────
+   Everything here is layout and stacking — nothing that carries a colour. The
+   palette lives in the two [data-theme] blocks below, and the ONLY differences
+   between light and dark are the token values and the veil colour. Same grid,
+   same photo, same proportions, exactly as asked. */
 .gate {
-  /* ── The gate runs LIGHT, and the rest of the product does not ───────────
-     The palette is re-pointed here rather than at :root, so every rule already
-     written against var(--text), var(--panel), var(--line) and the rest flips
-     inside this element and nowhere else. The dashboard behind the sign-in
-     screen stays black and gold, untouched, because none of these declarations
-     escape .gate.
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+  /* A soft cross-fade when the toggle flips, so the change reads as one thing
+     dimming up or down rather than a hard cut. Only colour properties — layout
+     never moves. */
+  transition: background .35s ease;
+}
 
-     That is also the one thing to be aware of: signing in moves you from a
-     near-white page to a near-black one in a single step. It reads as a
-     deliberate threshold if you expect it and as a flash if you do not. */
+/* ── Light: the estate under a white veil, dark text ───────────────────────
+   The palette is re-pointed on the themed selector, not on :root, so it flips
+   inside the sign-in screen and nowhere else. The dashboard stays black and
+   gold whatever the gate is set to. */
+.gate[data-theme='light'] {
   --text:       #16140f;
   --text-dim:   #4d4941;
   --text-faint: #6a655c;
@@ -288,50 +301,61 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
   --line:       rgba(22, 20, 15, 0.11);
   --line-2:     rgba(22, 20, 15, 0.17);
-
-  /* White hairlines are invisible on white. Both edge tokens invert to ink. */
   --edge:        rgba(22, 20, 15, 0.13);
   --edge-strong: rgba(22, 20, 15, 0.20);
 
-  /* #cd5f43 clears 4.5:1 against near-black and only manages 3.4:1 against
-     white — and it carries the sign-in errors, which is the one message on
-     this screen that must never be hard to read. */
+  /* #cd5f43 manages only 3.4:1 on white; the sign-in error is the one message
+     here that must never be hard to read, so light mode darkens it. */
   --clay:       #a8371d;
 
-  /* The document declares <meta name="color-scheme" content="dark">, which is
-     correct for the app and wrong for exactly this element. Form controls take
-     their default text colour, caret, autofill wash and spellcheck underline
-     from the colour scheme, NOT from an inherited `color` — so with the meta
-     alone the fields on this white card rendered near-white text on near-white
-     glass. Measured at 1.13:1, which is invisible, not merely low.
-
-     One declaration fixes the whole class of it. The explicit `color` on the
-     inputs below is the belt to this braces: Safari has historically ignored
-     colour-scheme for the text colour of a styled input. */
+  /* Form controls take their default text, caret, autofill wash and spellcheck
+     underline from the colour scheme, not from inherited `color`. The document
+     meta is `dark`; without this the white fields rendered near-white text. */
   color-scheme: light;
-
-  min-height: 100vh;
-  min-height: 100dvh;
-  display: grid;
-  place-items: center;
-  position: relative;
-  overflow: hidden;
-  background: #ffffff;
 }
 
-/* The white veil. A flat sheet rather than a gradient: the photograph has its
-   own light in it — bright sky at the top, dark tarmac at the bottom — and a
-   graduated veil would fight that instead of flattening it. 0.88 leaves the
-   estate as a suggestion of white blocks and green, which is the whole idea.
-   Sits above the image, below the grain. */
+/* ── Dark (Design 1): the estate under a near-black veil, warm-white text ───
+   The product's own palette — the same values :root carries — restated here so
+   the themed gate is self-contained and does not depend on inheritance order. */
+.gate[data-theme='dark'] {
+  --text:       #ece7dd;
+  --text-dim:   #9d988e;
+  --text-faint: #8c8779;
+
+  --ink:        #090909;
+  --ink-2:      #0e0e0e;
+  --panel:      #141414;
+  --panel-2:    #1a1a1a;
+  --panel-3:    #202020;
+
+  --line:       #242424;
+  --line-2:     #2f2f2f;
+  --edge:        rgba(255, 255, 255, 0.13);
+  --edge-strong: rgba(255, 255, 255, 0.22);
+
+  /* The app's #cd5f43 lands at ~4.5:1 on the translucent dark card — right on
+     the AA line for the sign-in error, which is the one message here that has
+     to be readable. Lifted a step for margin; scoped to the gate, so the app's
+     clay is untouched. */
+  --clay:       #e0765c;
+
+  color-scheme: dark;
+}
+
+/* The veil. A flat sheet rather than a gradient: the photo has its own light in
+   it (bright sky, dark tarmac) and a graduated veil would fight that. Only the
+   colour changes between themes — white to a suggestion, ink to a ghost. Sits
+   above the image, below the grain. */
 .gate::before {
   content: '';
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background: rgba(255, 255, 255, 0.88);
+  transition: background .35s ease;
 }
+.gate[data-theme='light']::before { background: rgba(255, 255, 255, 0.88); }
+.gate[data-theme='dark']::before  { background: rgba(9, 9, 9, 0.82); }
 
 /* ── 2% film grain ─────────────────────────────────────────────────────────
    feTurbulence rendered straight into a data URI — no image file, no request,
@@ -374,9 +398,16 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   z-index: 0;
   pointer-events: none;
   background: url('./estate.jpg') center / cover no-repeat;
-  filter: blur(3px) saturate(0.92);
   transform: scale(1.06);
+  transition: filter .35s ease;
 }
+
+/* Light lets the photo sit at its own brightness under the white veil. Dark
+   pulls it down first: an 82%-black veil still lets a 255 sky show as ~46,
+   which glows against the near-black form — brightness(0.55) turns that glow
+   into the faint structure the dark theme wants. */
+.gate[data-theme='light'] .gate-field { filter: blur(3px) saturate(0.92); }
+.gate[data-theme='dark']  .gate-field { filter: blur(3px) saturate(0.8) brightness(0.55); }
 /* .gate-brand, .gate-headline, .gate-blurb and .gate-points are gone with the
    split layout — the panel they lived in no longer exists. Their rules were
    deleted rather than left orphaned: dead CSS is the kind that gets copied into
@@ -445,31 +476,11 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
     0 0 64px rgba(201, 164, 92, 0.18);
 }
 
-/* The full stop, drawn rather than typed. A period glyph is round-ish, sits at
-   whatever size Funnel Display decided, and reads as punctuation; a square the
-   height of its own stem reads as part of the mark. Drawn in CSS so its size
-   is stated in em — it scales with the wordmark at every viewport instead of
-   being a fixed dot beside type that grows.
+/* The square full stop after the wordmark was removed at the user's request,
+   to match the supplied logo — the <i> that drew it is gone from the markup and
+   its rule with it. */
 
-   Gold, which puts the accent back on the mark now that the diamond is gone.
-   Tried in white — the same ink as the letters — and gold won: white made the
-   stop disappear into the word, and the point of a square full stop is that it
-   is a mark, not punctuation. One line to switch it back if that changes.
-
-   `vertical-align: baseline` on an inline-block sits its BOTTOM edge on the
-   baseline, which is exactly where a full stop sits. letter-spacing is zeroed
-   because the parent's 0.05em would otherwise push it away from the A. */
-.gate-topmark i {
-  display: inline-block;
-  width: 0.17em;
-  height: 0.17em;
-  margin-left: 0.07em;
-  background: var(--gold);
-  vertical-align: baseline;
-  letter-spacing: 0;
-}
-
-/* Only on mobile, where the left panel that would otherwise say this is gone. */
+/* Legacy hook, kept only because the mobile block still references it. */
 .gate-topmark span { display: none; }
 
 /* .gate-headline, .gate-headline em, .gate-blurb, .gate-points and every
@@ -490,8 +501,39 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   text-wrap: balance;
 }
 
-/* A single centred column, sitting above the geometric field. No grid-area:
-   .gate centres its one child, so there is nothing to place. */
+/* ── The theme toggle ──────────────────────────────────────────────────────
+   Top-right, above every other layer, quiet until hovered. It carries two
+   icons and shows the one for the mode you are NOT in, so the button always
+   pictures where a click will take you. */
+.gate-theme-toggle {
+  position: absolute;
+  top: clamp(16px, 3vw, 26px);
+  right: clamp(16px, 3vw, 26px);
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--text-dim);
+  border: 1px solid var(--edge);
+  background: transparent;
+  transition: color .2s ease, border-color .2s ease, background .2s ease;
+}
+
+.gate-theme-toggle:hover {
+  color: var(--text);
+  border-color: var(--edge-strong);
+}
+
+.gate-theme-toggle svg { width: 19px; height: 19px; }
+
+/* Sun while dark (click → light), moon while light (click → dark). Each theme
+   hides the icon that matches the mode you are already in. */
+.gate[data-theme='dark']  .tt-moon { display: none; }
+.gate[data-theme='light'] .tt-sun  { display: none; }
+
+/* A single centred column, sitting above the photo and grain. */
 .gate-form-wrap {
   position: relative;
   /* Above the grain (z-index 1), which is above the geometric field (0). */
@@ -519,28 +561,39 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
    the 65% gradient that made this look like a bordered ornament two passes
    ago. It is the only gold on the screen apart from the button and the full
    stop. */
+/* Glass over the veiled photo. Structure is shared; the fill, the border weight
+   and the shadow differ per theme, because each of those means something
+   different over white than over black. 15px blur sits mid-range in both — under
+   ~12 the photo competes with the labels, over ~18 the panel goes flat. */
 .gate-card {
   width: 100%;
-  /* White glass on a white-veiled photograph. The fill is barely a tint — the
-     panel is defined by the blur and the edge, not by being a different
-     colour from the page. */
-  background: rgba(255, 255, 255, 0.55);
-  /* Gold at 12% was the right weight against near-black. Against near-white it
-     is simply not there — the same alpha over a bright ground has almost no
-     contrast to spend. 0.42 is the equivalent PRESENCE, not the equivalent
-     number, and it is still a hairline you notice rather than read. */
-  border: 1px solid rgba(201, 164, 92, 0.42);
+  border: 1px solid;
   border-radius: var(--radius-lg);
   corner-shape: squircle;
   padding: 30px 26px;
   -webkit-backdrop-filter: blur(15px) saturate(130%);
   backdrop-filter: blur(15px) saturate(130%);
-  /* A shadow at 50% black was drawn for a panel floating over a near-black
-     page, where it reads as depth. On white the same value reads as dirt —
-     light surfaces take much softer, wider, weaker shadows or they look
-     pasted on. The inset highlight goes entirely: there is no lit top edge to
-     catch on a white panel sitting on a white page. */
+  transition: background .35s ease, border-color .35s ease, box-shadow .35s ease;
+}
+
+/* Light: barely-tinted white glass, a gold hairline at 0.42 (12% would vanish
+   on this bright ground), and a soft wide shadow — a dark shadow on white reads
+   as dirt, so it stays weak. No inset highlight: nothing to catch on white. */
+.gate[data-theme='light'] .gate-card {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(201, 164, 92, 0.42);
   box-shadow: 0 24px 60px rgba(22, 20, 15, 0.10);
+}
+
+/* Dark: near-black glass, a fainter gold edge (0.12 is plenty against black),
+   a deep drop shadow that reads as real depth here, and a hairline of light
+   along the top that a dark panel needs to lift off a dark page. */
+.gate[data-theme='dark'] .gate-card {
+  background: rgba(18, 18, 18, 0.55);
+  border-color: rgba(201, 164, 92, 0.14);
+  box-shadow:
+    0 30px 70px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 /* ── The one button ────────────────────────────────────────────────────────
