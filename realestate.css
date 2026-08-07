@@ -20,9 +20,17 @@
    instrument.
 
    WHAT IS DELIBERATELY ABSENT
-   No glassmorphism, no gradient-on-gradient, no neon, no floating robot.
-   A developer managing ₦2bn of other people's money is buying trust and
-   legibility. Restraint is the design.
+   No neon, no gradient-on-gradient, no floating robot. A developer managing
+   ₦2bn of other people's money is buying trust and legibility. Restraint is
+   the design.
+
+   THE ONE EXCEPTION is the sign-in card, which is glass over the night-city
+   reel behind it: a blurred translucent panel inside a champagne gradient
+   border. This line used to read "no glassmorphism", written for a version of
+   this product that had no photography in it. Glass over a flat colour is
+   decoration; glass over moving footage is what makes the panel legible and
+   the depth real. It stays confined to the gate — nothing behind the sign-in
+   screen is translucent.
 
    STRUCTURE
      1. Tokens          8. Tables
@@ -67,14 +75,66 @@
   --steel:      #7f9ec6;
   --steel-wash: rgba(127, 158, 198, 0.12);
 
-  --serif: 'Fraunces', 'Iowan Old Style', Georgia, serif;
-  --sans:  'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  --mono:  'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  /* ── Type ────────────────────────────────────────────────────────────────
+     One grotesque, two jobs. --display is the same Archivo as --sans, set
+     heavy and tight; the difference between a headline and a paragraph here is
+     weight and tracking, not a second typeface.
+
+     THIS REPLACED A SERIF. Fraunces (display) sat over Archivo (UI) on the
+     theory that editorial prose and instrument figures want different voices.
+     Against a night-city photograph it read as decorative rather than
+     confident — the wrong register for a product whose whole pitch is that the
+     numbers are correct. A single heavy grotesque says it plainly and drops a
+     webfont family off every page load. */
+  --display: 'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --sans:    'Archivo', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* The wordmark, and ONLY the wordmark. A logo is allowed its own face where
+     running text is not — Funnel Display's near-geometric caps and single-storey
+     'a' give ARCHTA a shape Archivo does not have, and using it anywhere else
+     would spend that distinctiveness on text nobody reads as identity. */
+  --wordmark: 'Funnel Display', 'Archivo', system-ui, sans-serif;
+
+  /* Two words, once, in the headline. A script against 900-weight caps is the
+     oldest contrast pairing there is and it only works while it stays rare —
+     the moment a second thing on the page is cursive, both stop meaning
+     anything. Never use this for UI text: Great Vibes has no bold, a tiny
+     x-height and joined letterforms, all of which make it unreadable below
+     display size. */
+  --script: 'Great Vibes', 'Apple Chancery', cursive;
 
   --sidebar-w: 236px;
   --topbar-h: 60px;
-  --radius: 10px;
-  --radius-sm: 6px;
+  /* ── Corners ─────────────────────────────────────────────────────────────
+     Squircled: superelliptical rather than a circular arc, so the straight
+     edge eases into the curve instead of meeting it at a visible seam. The
+     `corner-shape: squircle` property does this properly and is ignored by
+     browsers that do not know it — which is why the radii below are raised as
+     well. A larger circular radius is the fallback, and it reads as the same
+     intent even where the true superellipse is not drawn.
+
+     Raised from 10/6. The old values were drawn for a product with hard
+     photography in it; against the reel and the glass they looked like an
+     accident of the box model rather than a decision. */
+  --radius:    16px;
+  --radius-sm: 10px;
+  --radius-lg: 22px;   /* the sign-in card, and anything else that floats */
+  --radius-xl: 34px;   /* the seam between the two halves of the gate */
+
+  /* ── Edges ───────────────────────────────────────────────────────────────
+     Flat white, one value all the way round. This was a 145deg gradient that
+     ran bright at the top-left and faded through the middle; it is a stroke
+     again because an even edge is what reads as a frosted pane. The gradient
+     described a lit solid — light catching one corner of an object — and that
+     is the wrong object. Glass does not catch light on a corner; its whole rim
+     picks up the same scatter.
+
+     Two strengths: --edge for panels sitting on their own, --edge-strong for
+     the glass card, whose rim has to stay visible against moving footage. */
+  --edge:        rgba(255, 255, 255, 0.13);
+  --edge-strong: rgba(255, 255, 255, 0.22);
+  --edge-gold:   var(--gold);
 
   /* Shadows on near-black do almost nothing, so depth comes from a lighter
      surface plus a hairline. These are for things that genuinely float. */
@@ -102,6 +162,29 @@
    is load-bearing. Do not remove it, and do not give a hideable element a
    `display` value expecting `hidden` to override it. */
 [hidden] { display: none !important; }
+
+/* ── Squircled corners ─────────────────────────────────────────────────────
+   `corner-shape: squircle` draws a superellipse instead of a circular arc: the
+   straight edge eases into the curve rather than meeting it at a tangent, which
+   is the difference between "rounded rectangle" and the corner shape phone
+   hardware and app icons use.
+
+   Listed explicitly rather than applied with `*` — the property costs nothing
+   on a browser that ignores it, but a wildcard would also hit the round things
+   (avatars, the diamond bullets, pill badges) where a superellipse is wrong.
+
+   Browsers without it fall back to the circular arc at the same radius, which
+   is why --radius went up as well: the enlarged radii carry the intent on
+   their own, and the squircle refines it where supported. */
+.gate-card, .gate-tabs, .gate-tab,
+.card, .stat, .brief, .modal, .toast,
+.input, .select, .textarea,
+.btn, .btn-quiet, .icon-btn,
+.search input, .search-results, .search-hit,
+.nav-item, .who, .risk-chip, .action-link,
+.workspace-switcher select {
+  corner-shape: squircle;
+}
 
 html { -webkit-text-size-adjust: 100%; }
 
@@ -154,131 +237,346 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   font-weight: 600;
 }
 
-.serif { font-family: var(--serif); font-weight: 400; }
+/* Kept under its original name because portal.html and portal.js apply it by
+   string, and a rename there buys nothing. It is no longer a serif — it is the
+   display face, one step up in weight from the surrounding UI. */
+.serif { font-family: var(--display); font-weight: 700; letter-spacing: -0.015em; }
 
 /* ── 3. Auth gate ──────────────────────────────────────────────────────── */
+/* One centred column. The two-column split — city on the left, form on the
+   right — is gone with the video that justified it: a 1.05fr/1fr grid exists to
+   give a picture somewhere to live, and with no picture it was just a form
+   pushed off to one side for no reason. Centred is the honest arrangement when
+   there is exactly one thing to do. */
+/* ── The stack ─────────────────────────────────────────────────────────────
+   Built in layers, back to front:
+
+     1. #090909                     the base
+     2. warm radial glow            top right
+     3. charcoal radial glow        bottom left
+     4. geometric field             .gate-field, the SVG
+     5. 2% film grain               .gate::after
+     6. the form                    .gate-form-wrap
+
+   The two glows are painted here rather than as elements because a gradient
+   costs nothing and an element costs a node, a stacking context and a rule to
+   keep it behind everything else.
+
+   Order matters in the shorthand: CSS paints background layers FIRST-listed on
+   top, so the warm glow sits over the charcoal one, and the flat colour goes
+   last because it is the ground everything else lies on. */
 .gate {
+  /* ── The gate runs LIGHT, and the rest of the product does not ───────────
+     The palette is re-pointed here rather than at :root, so every rule already
+     written against var(--text), var(--panel), var(--line) and the rest flips
+     inside this element and nowhere else. The dashboard behind the sign-in
+     screen stays black and gold, untouched, because none of these declarations
+     escape .gate.
+
+     That is also the one thing to be aware of: signing in moves you from a
+     near-white page to a near-black one in a single step. It reads as a
+     deliberate threshold if you expect it and as a flash if you do not. */
+  --text:       #16140f;
+  --text-dim:   #4d4941;
+  --text-faint: #6a655c;
+
+  --ink:        #ffffff;
+  --ink-2:      #ffffff;
+  --panel:      #ffffff;
+  --panel-2:    #f5f3ef;
+  --panel-3:    #ebe8e2;
+
+  --line:       rgba(22, 20, 15, 0.11);
+  --line-2:     rgba(22, 20, 15, 0.17);
+
+  /* White hairlines are invisible on white. Both edge tokens invert to ink. */
+  --edge:        rgba(22, 20, 15, 0.13);
+  --edge-strong: rgba(22, 20, 15, 0.20);
+
+  /* #cd5f43 clears 4.5:1 against near-black and only manages 3.4:1 against
+     white — and it carries the sign-in errors, which is the one message on
+     this screen that must never be hard to read. */
+  --clay:       #a8371d;
+
+  /* The document declares <meta name="color-scheme" content="dark">, which is
+     correct for the app and wrong for exactly this element. Form controls take
+     their default text colour, caret, autofill wash and spellcheck underline
+     from the colour scheme, NOT from an inherited `color` — so with the meta
+     alone the fields on this white card rendered near-white text on near-white
+     glass. Measured at 1.13:1, which is invisible, not merely low.
+
+     One declaration fixes the whole class of it. The explicit `color` on the
+     inputs below is the belt to this braces: Safari has historically ignored
+     colour-scheme for the text colour of a styled input. */
+  color-scheme: light;
+
   min-height: 100vh;
   min-height: 100dvh;
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  background: var(--ink);
-}
-
-/* Left: the identity. Right: the form. On a phone the identity collapses
-   away entirely, because nobody scrolls past a manifesto to sign in. */
-.gate-brand {
+  place-items: center;
   position: relative;
-  padding: 56px 56px 44px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  border-right: 1px solid var(--line);
   overflow: hidden;
+  background: #ffffff;
 }
 
-/* A single, very slow gold bloom. The only decorative gradient in the whole
-   product, at 16% behind text that never sits on its brightest point. */
-.gate-brand::after {
+/* The white veil. A flat sheet rather than a gradient: the photograph has its
+   own light in it — bright sky at the top, dark tarmac at the bottom — and a
+   graduated veil would fight that instead of flattening it. 0.88 leaves the
+   estate as a suggestion of white blocks and green, which is the whole idea.
+   Sits above the image, below the grain. */
+.gate::before {
   content: '';
   position: absolute;
-  inset: -30% -40% auto -20%;
-  height: 80%;
-  background: radial-gradient(60% 60% at 30% 30%, rgba(201, 164, 92, 0.16), transparent 70%);
+  inset: 0;
+  z-index: 1;
   pointer-events: none;
+  background: rgba(255, 255, 255, 0.88);
 }
 
-.gate-brand > * { position: relative; z-index: 1; }
+/* ── 2% film grain ─────────────────────────────────────────────────────────
+   feTurbulence rendered straight into a data URI — no image file, no request,
+   and it tiles seamlessly because of stitchTiles.
 
-.gate-mark {
-  display: inline-flex;
-  align-items: center;
-  gap: 11px;
-  font-family: var(--serif);
-  font-size: 19px;
-  letter-spacing: 0.04em;
+   Grain is what stops large flat gradients banding. On a near-black page a
+   glow spread over 800px crosses maybe six 8-bit steps, and those steps show
+   as visible rings; a couple of percent of noise dithers them away. It is
+   doing real work here, not just adding texture.
+
+   Sits ABOVE the geometric field and BELOW the form: grain over a gradient is
+   film, grain over 10px type is dirt. pointer-events:none so it never
+   intercepts a click on the thing behind it. */
+.gate::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.02;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 170px 170px;
 }
 
-.gate-mark i {
-  width: 26px; height: 26px;
-  display: grid; place-items: center;
-  border: 1px solid var(--line-gold);
-  border-radius: 5px;
-  color: var(--gold);
-  font-style: normal;
-  font-size: 12px;
+/* ── The photograph ────────────────────────────────────────────────────────
+   Bottom of the stack, inert, and the only layer carrying an image.
+
+   The source is 750px wide, which would be soft stretched across a 1920px
+   screen — except it is about to be covered by an 88% white sheet, so the
+   detail that softness would cost is detail nobody will see. The 3px blur is
+   there for the same reason from the other direction: it makes the softness
+   look chosen rather than like an image running past its resolution.
+
+   scale(1.06) because blur samples transparent pixels beyond the element's
+   edge and feathers them into a pale rim; overscanning pushes that rim off
+   screen. */
+.gate-field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('./estate.jpg') center / cover no-repeat;
+  filter: blur(3px) saturate(0.92);
+  transform: scale(1.06);
+}
+/* .gate-brand, .gate-headline, .gate-blurb and .gate-points are gone with the
+   split layout — the panel they lived in no longer exists. Their rules were
+   deleted rather than left orphaned: dead CSS is the kind that gets copied into
+   the next thing by someone who assumes it is load-bearing. */
+
+/* ── The wordmark ──────────────────────────────────────────────────────────
+   Black-weight caps rather than the old boxed-diamond lockup. Two changes,
+   each doing one job:
+
+     * the box around the diamond is gone. A bordered tile reads as a UI
+       control — something you could click — and a wordmark should not;
+     * 900 weight, near-zero tracking. An earlier pass set this at 0.22em on
+       the usual reasoning that open tracking separates a mark from a word.
+       That reasoning holds for a light mark and inverts for a heavy one: wide
+       spacing makes black caps look like they are falling apart. Weight is
+       carrying the identity here, so the letters close up. */
+/* Centred over the card, and set the way the reference sets a wordmark: heavy,
+   uppercase, tracked just enough to breathe and no further.
+
+   The previous version was 0.22em — airy, and airy is the opposite of what
+   900 weight is for. Wide tracking makes a mark look delicate; this one should
+   look built. 0.05em is the floor at which adjacent caps in a black weight
+   stop touching, which is the only reason it is not zero. */
+/* Block, not flex, and the box is the reason. A flex container makes the
+   wordmark and the full stop separate flex ITEMS, and vertical-align does not
+   apply to flex items at all — `align-items: center` was quietly centring the
+   box on the cap height instead, leaving it floating six pixels off the
+   baseline. In normal flow they are inline siblings again and the box sits
+   where a full stop sits. text-align does the centring the flex rules used to. */
+.gate-topmark {
+  display: block;
+  text-align: center;
+  font-family: var(--wordmark);
+  /* Sized against the COLUMN, not the viewport. .gate-form-wrap declares
+     itself a container below, so 1cqw is one percent of this column's width and
+     the mark holds the same proportion of it at every screen size — which is
+     what "60% of the right side" has to mean if it is to survive a resize.
+     Large again, but for a different reason than the first time. It ran at
+     ~54% of the column when there was a display headline beside it, and two
+     display-scale elements fighting is the same as having none — so it went to
+     19px. The headline is gone now, which leaves the wordmark as the only
+     typography on the screen with any weight to it. Nothing left to compete
+     with, so it takes the space.
+
+     Fixed rather than container-query sized: there is no proportion left to
+     hold, so there is no coefficient to re-measure every time a glyph changes.
+     It scales on viewport instead, which is what a single centred column
+     actually needs. */
+  font-size: clamp(30px, 4.2vw, 42px);
+  font-weight: 800;          /* Funnel Display tops out here */
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--text);
+  /* Three layers, because one shadow on near-black just looks like blur:
+       1. a hairline light edge along the top, which is what actually reads as
+          "raised" — the eye takes a lit top edge as geometry, not decoration;
+       2. a real drop shadow for depth;
+       3. a wide, faint gold bloom. It is the same champagne as the accent and
+          the streetlights in the reel, so the mark looks lit BY the page
+          rather than stuck on top of it. Kept under 20% — a glow that reads as
+          a glow is neon, and this is not that. */
+  text-shadow:
+    0 -1px 0 rgba(255, 255, 255, 0.10),
+    0 10px 26px rgba(0, 0, 0, 0.80),
+    0 0 64px rgba(201, 164, 92, 0.18);
 }
 
-.gate-headline {
-  font-family: var(--serif);
-  font-size: clamp(34px, 4.2vw, 52px);
-  line-height: 1.06;
-  font-weight: 400;
-  letter-spacing: -0.02em;
-  max-width: 15ch;
-  margin: 0 0 18px;
+/* The full stop, drawn rather than typed. A period glyph is round-ish, sits at
+   whatever size Funnel Display decided, and reads as punctuation; a square the
+   height of its own stem reads as part of the mark. Drawn in CSS so its size
+   is stated in em — it scales with the wordmark at every viewport instead of
+   being a fixed dot beside type that grows.
+
+   Gold, which puts the accent back on the mark now that the diamond is gone.
+   Tried in white — the same ink as the letters — and gold won: white made the
+   stop disappear into the word, and the point of a square full stop is that it
+   is a mark, not punctuation. One line to switch it back if that changes.
+
+   `vertical-align: baseline` on an inline-block sits its BOTTOM edge on the
+   baseline, which is exactly where a full stop sits. letter-spacing is zeroed
+   because the parent's 0.05em would otherwise push it away from the A. */
+.gate-topmark i {
+  display: inline-block;
+  width: 0.17em;
+  height: 0.17em;
+  margin-left: 0.07em;
+  background: var(--gold);
+  vertical-align: baseline;
+  letter-spacing: 0;
 }
 
-.gate-headline em { font-style: italic; color: var(--gold); }
+/* Only on mobile, where the left panel that would otherwise say this is gone. */
+.gate-topmark span { display: none; }
 
-.gate-blurb {
+/* .gate-headline, .gate-headline em, .gate-blurb, .gate-points and every
+   .gate-reel rule were deleted here. The headline is gone at the user's
+   request, and the reel is gone with the video it played — leaving their CSS
+   behind would be ~130 lines describing elements no page contains. */
+
+/* The line under the wordmark: what this product is, in one sentence, and the
+   only prose on the screen. --text-dim rather than --text so it supports the
+   mark instead of competing with it. */
+.gate-lede {
+  margin: 14px 0 34px;
+  max-width: 34ch;
+  text-align: center;
   color: var(--text-dim);
-  max-width: 42ch;
-  font-size: 15px;
-  line-height: 1.65;
+  font-size: 14.5px;
+  line-height: 1.55;
+  text-wrap: balance;
 }
 
-/* Three statements about behaviour, replacing what used to be three numbers
-   pretending to be live metrics. Prose, because each one needs a clause to
-   mean anything. */
-.gate-points {
-  list-style: none;
-  margin: 34px 0 0;
-  padding: 26px 0 0;
-  border-top: 1px solid var(--line);
+/* A single centred column, sitting above the geometric field. No grid-area:
+   .gate centres its one child, so there is nothing to place. */
+.gate-form-wrap {
+  position: relative;
+  /* Above the grain (z-index 1), which is above the geometric field (0). */
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 13px;
-  max-width: 46ch;
+  align-items: center;
+  width: 100%;
+  max-width: 420px;
+  padding: 44px 24px;
+}
+/* ── The glass, back and now earned ────────────────────────────────────────
+   The last pass stripped this to nothing on the grounds that backdrop-filter
+   over a flat colour is a no-op — true at the time, and no longer true. There
+   are now two radial glows, a geometric field and a grain layer behind this
+   panel, so the blur has gradient, edges and noise to actually work on. Glass
+   needs something behind it to be glass; that is the whole condition, and it
+   is met.
+
+   15px sits mid-range: under about 12 the shapes behind stay legible enough to
+   compete with the labels in front, and over about 18 the panel goes uniform
+   and the effect is indistinguishable from a flat fill.
+
+   The border is gold at 12% — present enough to draw the edge, far short of
+   the 65% gradient that made this look like a bordered ornament two passes
+   ago. It is the only gold on the screen apart from the button and the full
+   stop. */
+.gate-card {
+  width: 100%;
+  /* White glass on a white-veiled photograph. The fill is barely a tint — the
+     panel is defined by the blur and the edge, not by being a different
+     colour from the page. */
+  background: rgba(255, 255, 255, 0.55);
+  /* Gold at 12% was the right weight against near-black. Against near-white it
+     is simply not there — the same alpha over a bright ground has almost no
+     contrast to spend. 0.42 is the equivalent PRESENCE, not the equivalent
+     number, and it is still a hairline you notice rather than read. */
+  border: 1px solid rgba(201, 164, 92, 0.42);
+  border-radius: var(--radius-lg);
+  corner-shape: squircle;
+  padding: 30px 26px;
+  -webkit-backdrop-filter: blur(15px) saturate(130%);
+  backdrop-filter: blur(15px) saturate(130%);
+  /* A shadow at 50% black was drawn for a panel floating over a near-black
+     page, where it reads as depth. On white the same value reads as dirt —
+     light surfaces take much softer, wider, weaker shadows or they look
+     pasted on. The inset highlight goes entirely: there is no lit top edge to
+     catch on a white panel sitting on a white page. */
+  box-shadow: 0 24px 60px rgba(22, 20, 15, 0.10);
 }
 
-.gate-points li {
-  position: relative;
-  padding-left: 20px;
-  font-size: 13.5px;
-  line-height: 1.55;
-  color: var(--text-faint);
+/* ── The one button ────────────────────────────────────────────────────────
+   Scoped to the gate rather than raising .btn.lg globally — the app is full of
+   large buttons that must NOT become this loud.
+
+   40px high and 14px was the same weight as the fields above it, which left
+   the screen with no single dominant control. It is now taller than any input,
+   heavier than any label, and the only gold surface in view. Nothing else here
+   is allowed to look clickable to the same degree; that is the entire point.
+   The extra top margin separates it from the last field so it reads as the
+   conclusion of the form rather than another row in it. */
+.gate-card .btn.primary {
+  height: 52px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin-top: 26px;
 }
 
-.gate-points li::before {
-  content: '◆';
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: var(--gold);
-  font-size: 9px;
-  line-height: 1.9;
-}
+/* Air between the fields. With the tabs, the title and the subtitle gone,
+   spacing is what carries the rhythm the copy used to. */
+.gate-card .field { margin-bottom: 18px; }
 
-.gate-points b { color: var(--text-dim); font-weight: 600; }
+/* Close enough to read as a single lockup with the tabs directly beneath. */
+.gate-topmark { margin-bottom: 26px; }
 
-/* Desktop hides this: the full brand panel is already on the left, and two
-   wordmarks on one screen is a mistake. It exists for the mobile breakpoint,
-   where that panel is gone. */
-.gate-card-brand { display: none; }
-
-.gate-form-wrap {
-  display: grid;
-  place-items: center;
-  padding: 40px 28px;
-}
-
-.gate-card { width: 100%; max-width: 372px; }
-
+/* 400 was right for the serif — a display serif at 27px already has presence
+   from its stroke contrast. A grotesque has none, so the same weight reads as
+   unfinished. Every title below moves to 800 for that reason, and pulls its
+   tracking negative to match. */
 .gate-title {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 27px;
-  font-weight: 400;
+  font-weight: 800;
+  letter-spacing: -0.02em;
   margin-bottom: 6px;
 }
 
@@ -289,7 +587,7 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   display: flex;
   gap: 2px;
   background: var(--panel);
-  border: 1px solid var(--line);
+  border: 1px solid var(--edge);
   border-radius: var(--radius-sm);
   padding: 3px;
   margin-bottom: 24px;
@@ -380,10 +678,10 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 }
 
 .page-title {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 26px;
-  font-weight: 400;
-  letter-spacing: -0.015em;
+  font-weight: 800;
+  letter-spacing: -0.022em;
 }
 
 .page-sub { color: var(--text-dim); font-size: 13px; margin-top: 3px; }
@@ -408,9 +706,14 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   gap: 10px;
   padding: 18px 18px 16px;
   border-bottom: 1px solid var(--line);
-  font-family: var(--serif);
-  font-size: 17px;
-  letter-spacing: 0.03em;
+  /* The same mark as the gate, so signing in does not change the logo:
+     900, uppercase, 0.05em. Only the size differs, because a sidebar has less
+     room than a landing column. */
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
 }
 
 .sidebar-brand i {
@@ -792,10 +1095,26 @@ table.data td.num, table.data th.num {
   margin-bottom: 6px;
 }
 
+/* ── Gradient edges on the fields ──────────────────────────────────────────
+   Two backgrounds and a TRANSPARENT border: the fill is clipped to the padding
+   box, the gradient to the border box, so the 1px frame is the gradient itself.
+
+   This is the same result the SVG `clip-path: url(#squircle)` trick is usually
+   reached for, without its two costs — a clip-path cuts the border off along
+   with everything else outside the path, and it disables backdrop-filter on
+   the element. `corner-shape: squircle` (declared near the top of this file)
+   gives the superellipse natively and leaves both intact. */
+/* Flat white edge, back to a plain border now that the gradient is gone —
+   which also means border-color works again, so focus and error states go back
+   to changing one property instead of restacking two background layers. */
 .input, .select, .textarea {
   width: 100%;
+  /* Stated rather than inherited. A form control does not take `color` from
+     its parent by default — it takes it from the colour scheme — so leaving
+     this out is what let the gate's white fields render white text. */
+  color: var(--text);
   background: var(--ink-2);
-  border: 1px solid var(--line-2);
+  border: 1px solid var(--edge);
   border-radius: var(--radius-sm);
   padding: 9px 12px;
   font-size: 14px;
@@ -806,15 +1125,17 @@ table.data td.num, table.data th.num {
 
 .input:focus, .select:focus, .textarea:focus {
   outline: none;
-  border-color: var(--gold);
+  border-color: var(--edge-gold);
   background: var(--panel);
 }
 
 .input:disabled, .select:disabled, .textarea:disabled { opacity: 0.5; cursor: not-allowed; }
+
 .input.is-error, .select.is-error { border-color: var(--clay); }
 
 .textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
 
+/* The native select arrow is bright grey on every platform; replace it. */
 /* The native select arrow is bright grey on every platform; replace it. */
 .select {
   appearance: none;
@@ -1114,7 +1435,7 @@ table.data td.num, table.data th.num {
   border-bottom: 1px solid var(--line);
 }
 
-.modal-title { font-family: var(--serif); font-size: 18px; font-weight: 400; }
+.modal-title { font-family: var(--display); font-size: 18px; font-weight: 700; letter-spacing: -0.015em; }
 .modal-body { padding: 20px; overflow-y: auto; }
 
 .modal-foot {
@@ -1202,10 +1523,10 @@ table.data td.num, table.data th.num {
 .greeting { margin-bottom: 22px; }
 
 .greeting h1 {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(24px, 3vw, 31px);
-  font-weight: 400;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  letter-spacing: -0.025em;
 }
 
 .greeting-lines { margin-top: 9px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
@@ -1239,8 +1560,12 @@ table.data td.num, table.data th.num {
 
 .brief-head { display: flex; align-items: center; gap: 12px; margin-bottom: 13px; flex-wrap: wrap; }
 
+/* Prose, not display — the AI's own words, read a paragraph at a time. It took
+   the serif before for readability at length; it takes --sans now for the same
+   reason and deliberately does NOT get the heavier weight the titles got.
+   Bolding running text is how you make it harder to read, not more important. */
 .brief-body {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 17.5px;
   line-height: 1.62;
   letter-spacing: -0.005em;
@@ -1348,8 +1673,10 @@ table.data td.num, table.data th.num {
 .draft { padding: 14px 16px; border-bottom: 1px solid var(--line); }
 .draft:last-child { border-bottom: none; }
 
+/* A drafted WhatsApp or email message — prose again, and shown as the buyer
+   will receive it, so the same reasoning as .brief-body applies. */
 .draft-text {
-  font-family: var(--serif);
+  font-family: var(--sans);
   font-size: 13.5px;
   line-height: 1.62;
   color: var(--text-dim);
@@ -1546,37 +1873,13 @@ table.data td.num, table.data th.num {
 }
 
 @media (max-width: 900px) {
-  .gate { grid-template-columns: 1fr; }
-  .gate-brand { display: none; }
-  .gate-form-wrap { padding: 28px 20px; align-items: start; }
-
-  /* The brand panel is gone, so the wordmark moves into the card. Without this
-     a phone user saw "Welcome back" over a bare dark form with no indication of
-     which product they were signing into. */
-  .gate-card-brand {
-    display: block;
-    font-family: var(--serif);
-    font-size: 16px;
-    letter-spacing: 0.04em;
-    padding-bottom: 18px;
-    margin-bottom: 22px;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .gate-card-brand i {
-    font-style: normal;
-    color: var(--gold);
-    margin-right: 7px;
-  }
-
-  .gate-card-brand span {
-    display: block;
-    font-family: var(--sans);
-    font-size: 12px;
-    letter-spacing: 0;
-    color: var(--text-faint);
-    margin-top: 4px;
-  }
+@media (max-width: 900px) {
+  /* Almost nothing left to say. The layout is one centred column at every
+     width now, so there is no split to collapse and no reel to re-scrim —
+     this block used to hold sixty lines undoing a two-column arrangement that
+     no longer exists. Only the breathing room changes on a small screen. */
+  .gate-form-wrap { padding: 32px 20px; }
+  .gate-lede { margin-bottom: 28px; }
 }
 
 /* Google renders its button at a fixed pixel width, which overflows the card on

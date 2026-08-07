@@ -29,7 +29,11 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Archivo:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Archivo for everything, Funnel Display for the wordmark alone, IBM Plex
+       Mono for figures. Archivo's ital axis is requested explicitly (1,400..900)
+       so the emphasis in the headline is a DRAWN italic — without it the browser
+       fakes one by slanting the roman, which at 900 weight looks like a bug. -->
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,400..900&family=Funnel+Display:wght@300..800&family=Great+Vibes&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./realestate.css">
 
   <!-- Sets window.__API_BASE__. A separate file rather than an inline block
@@ -48,54 +52,54 @@
      password, and no way to sign in from a second device. `npm run token`
      still exists — it is a debugging tool now, not the only way in. -->
 <main class="gate" id="gate" hidden>
-  <section class="gate-brand">
-    <div class="gate-mark"><i>◆</i> ARCHTA</div>
 
-    <div>
-      <h1 class="gate-headline">Every naira, <em>accounted for.</em></h1>
-      <p class="gate-blurb">
-        Installment sales, allocations and collections for property developers —
-        with a brief on your desk at 7am telling you who has fallen behind,
-        what is due this week, and what to say to whom.
-      </p>
+  <!-- ── The field ─────────────────────────────────────────────────────────
+       A photograph of a Nigerian estate, veiled almost to white.
 
-      <!-- These are statements about how the product behaves, not counters.
-           The previous version showed "07:00 / 0 / ₦" as if they were live
-           metrics, which read as a claim nobody could interpret — a first-time
-           visitor cannot tell whether "0 double allocations" means "we have
-           never caused one" or "you currently have none". Each line now says
-           what it means. -->
-      <ul class="gate-points">
-        <li><b>A brief every morning at 7:00</b> — written overnight, waiting when you open the app</li>
-        <li><b>Double allocation is physically blocked</b> — the database refuses a second live reservation on a unit, whatever the app does</li>
-        <li><b>Schedules balance to the kobo</b> — installments always sum to the exact plan total</li>
-      </ul>
-    </div>
+       An earlier pass replaced a video of a city with abstract isometric
+       geometry on the argument that a picture of buildings is the literal
+       reading of "architecture". That argument holds when the picture is
+       PRESENT. Veiled to a ghost it stops being a photograph of anything and
+       becomes what the geometry was reaching for anyway — structure felt
+       rather than seen — while carrying something the wireframes could not:
+       this is the actual market, Nigerian estate housing, not a stock idea
+       of architecture.
 
-    <div class="faint" style="font-size:12px">Paystack, bank transfer, cash and POS.</div>
-  </section>
+       Empty div. The image, the blur and the white veil are all CSS, so there
+       is no markup here to keep in step with the styling. -->
+  <div class="gate-field" aria-hidden="true"></div>
 
   <section class="gate-form-wrap">
+
+    <!-- Wordmark, then the one line that says what this is. The h1 is here
+         because it is now the only heading on the first screen — the display
+         headline it used to share the page with is gone. -->
+    <h1 class="gate-topmark">
+      ARCHTA<i aria-hidden="true"></i>
+    </h1>
+
+    <p class="gate-lede">Installment sales, allocations and collections for property developers.</p>
+
     <div class="gate-card">
-
-      <!-- The brand, for mobile only. Under 900px the whole left panel is
-           hidden, which previously left a bare dark form with no indication of
-           what you were signing into. Shown here instead of unhiding the panel
-           because nobody scrolls past a product pitch to reach a password
-           field on a phone. -->
-      <div class="gate-card-brand"><i>◆</i> ARCHTA
-        <span>Sales operations for property developers</span>
-      </div>
-
-      <div class="gate-tabs" role="tablist" id="gate-tabs">
-        <button class="gate-tab" role="tab" id="tab-login" aria-selected="true" type="button">Sign in</button>
-        <button class="gate-tab" role="tab" id="tab-register" aria-selected="false" type="button">Create account</button>
-      </div>
+      <!-- The tab pair that used to sit here is gone. It made a person choose a
+           MODE before they could take the action, and it put a second bordered
+           control directly above the one button on the page that matters. The
+           "Create one" link in the footer does the same job at a fraction of
+           the visual cost — which is how Stripe, Linear and Vercel all handle
+           the same problem. -->
 
       <!-- Sign in -->
       <form id="form-login" autocomplete="on" novalidate>
-        <h1 class="gate-title">Welcome back</h1>
-        <p class="gate-sub" id="gate-login-sub">Sign in to your workspace.</p>
+        <!-- No "Welcome back" and no "Sign in to your workspace." A form with
+             an email field, a password field and a button reading Sign in does
+             not need two lines of prose explaining that it signs you in. They
+             were also a second h1 competing with the headline.
+
+             This line survives them, empty and hidden, for the ONE case that
+             carries real information: arriving on an invite link, where
+             "Invited to Adron Homes as Sales Executive" is the reason the
+             person is here. Filler by default, context when there is any. -->
+        <p class="gate-sub hidden" id="gate-login-sub"></p>
 
         <div class="field">
           <label for="login-email">Email</label>
@@ -124,7 +128,7 @@
 
       <!-- Create account -->
       <form id="form-register" autocomplete="on" novalidate hidden>
-        <h1 class="gate-title">Create your workspace</h1>
+        <h2 class="gate-title">Create your workspace</h2>
         <p class="gate-sub" id="gate-register-sub">Your projects, buyers and payments, in one place.</p>
 
         <div class="field">
@@ -164,7 +168,7 @@
 
       <!-- Forgot password -->
       <form id="form-forgot" autocomplete="on" novalidate hidden>
-        <h1 class="gate-title">Reset your password</h1>
+        <h2 class="gate-title">Reset your password</h2>
         <p class="gate-sub">We will email you a link. It works once and expires within the hour.</p>
 
         <div class="field">
@@ -187,7 +191,7 @@
            from the emailed link, so this is a status screen with a resend
            button on it. -->
       <form id="form-verify" novalidate hidden>
-        <h1 class="gate-title">Confirm your email</h1>
+        <h2 class="gate-title">Confirm your email</h2>
         <p class="gate-sub" id="verify-sub">Checking your link…</p>
 
         <p class="notice ok hidden" id="verify-ok"></p>
@@ -204,7 +208,7 @@
 
       <!-- Choose a new password (reached from the emailed link) -->
       <form id="form-reset" autocomplete="on" novalidate hidden>
-        <h1 class="gate-title">Choose a new password</h1>
+        <h2 class="gate-title">Choose a new password</h2>
         <p class="gate-sub">Then you will be signed straight in.</p>
 
         <div class="field">

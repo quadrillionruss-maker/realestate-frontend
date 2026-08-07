@@ -835,11 +835,14 @@
   // ── Gate ──────────────────────────────────────────────────────────────
   var gateForms = ['form-login', 'form-register', 'form-forgot', 'form-reset', 'form-verify'];
 
+  // The sign-in / create-account tab pair was removed from the gate: it asked
+  // for a mode decision ahead of the primary action and put a second bordered
+  // control above the only button that matters. Switching between the two forms
+  // now happens through the quiet text links in each form's footer, which this
+  // still drives — so there is no #gate-tabs, #tab-login or #tab-register to
+  // address any more.
   function showGateForm(id) {
     gateForms.forEach(function (formId) { el(formId).hidden = formId !== id; });
-    el('gate-tabs').hidden = (id !== 'form-login' && id !== 'form-register');
-    el('tab-login').setAttribute('aria-selected', String(id === 'form-login'));
-    el('tab-register').setAttribute('aria-selected', String(id === 'form-register'));
 
     var focus = qs('#' + id + ' input');
     if (focus) setTimeout(function () { focus.focus(); }, 30);
@@ -852,8 +855,6 @@
   }
 
   function wireGate() {
-    el('tab-login').addEventListener('click', function () { showGateForm('form-login'); });
-    el('tab-register').addEventListener('click', function () { showGateForm('form-register'); });
     el('link-to-register').addEventListener('click', function () { showGateForm('form-register'); });
     el('link-to-login').addEventListener('click', function () { showGateForm('form-login'); });
     el('link-forgot').addEventListener('click', function () { showGateForm('form-forgot'); });
@@ -1234,6 +1235,7 @@
     el('btn-resend-verify').classList.remove('hidden');
   }
 
+
   function showGate() {
     RE.state.user = null;
     el('app').hidden = true;
@@ -1293,7 +1295,6 @@
       RE.state.config = await request('/auth/config', { noAuthRedirect: true });
       mountGoogle(RE.state.config.google_client_id);
       if (!RE.state.config.allow_registration) {
-        el('tab-register').hidden = true;
         el('link-to-register').closest('span').hidden = true;
       }
     } catch (e) {
@@ -1382,7 +1383,10 @@
       // waiting to be accepted.
       showGateForm('form-login');
       el('login-email').value = preview.email || '';
+      // Hidden by default now that the sign-in form carries no standing
+      // subtitle — an invite is the one thing worth putting there.
       el('gate-login-sub').textContent = invitedAs + ' Sign in to continue.';
+      el('gate-login-sub').classList.remove('hidden');
     } else {
       showGateForm('form-register');
       el('reg-email').value = preview.email || '';
