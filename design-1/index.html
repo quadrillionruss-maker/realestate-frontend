@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Archta — Design 1 (City Night)</title>
+
+<!-- ═══════════════════════════════════════════════════════════════════════
+     DESIGN 1 — "City Night"
+     A saved snapshot of the first sign-in direction: dark, a night-city
+     timelapse behind glass, black + champagne gold. Standalone — no backend,
+     no auth, no shared stylesheet. This page is a visual reference, kept so
+     the direction is not lost the way it was the first time.
+
+     The live app has since moved to the light "Estate" direction. This file
+     does not affect it; it stands entirely on its own.
+     ═══════════════════════════════════════════════════════════════════════ -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,400..900;1,400..900&family=Funnel+Display:wght@300..800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --ink: #090909;
+  --text: #ece7dd;
+  --text-dim: #9d988e;
+  --text-faint: #8c8779;
+  --gold: #c9a45c;
+  --gold-soft: #e0c48c;
+  --display: 'Archivo', system-ui, sans-serif;
+  --wordmark: 'Funnel Display', 'Archivo', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --radius-sm: 10px;
+  --radius-lg: 22px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--ink);
+  color: var(--text);
+  font-family: var(--display);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* One centred column over a full-bleed reel. */
+.gate {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--ink);
+}
+
+/* ── The reel ────────────────────────────────────────────────────────────── */
+.gate-reel { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+
+.gate-reel video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  /* Dim, desaturate, and a light blur — text over moving footage needs the
+     small high-contrast detail (headlights, windows) dissolved, not just the
+     brightness dropped. Overscanned so the blur's pale rim sits off-screen. */
+  filter: brightness(0.34) saturate(0.7) blur(1.5px);
+  transform: scale(1.05);
+}
+
+/* Scrim, densest where the wordmark and card sit. */
+.gate-reel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 55% at 50% 46%, rgba(9,9,9,0.34), rgba(9,9,9,0.72) 100%),
+    linear-gradient(to top, rgba(9,9,9,0.6), transparent 55%);
+}
+
+/* ── The column ──────────────────────────────────────────────────────────── */
+.gate-form-wrap {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 420px;
+  padding: 44px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── The wordmark ────────────────────────────────────────────────────────── */
+.gate-topmark {
+  margin: 0;
+  font-family: var(--wordmark);
+  font-size: clamp(30px, 4.2vw, 42px);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: var(--text);
+  text-align: center;
+  text-shadow: 0 -1px 0 rgba(255,255,255,0.10), 0 10px 26px rgba(0,0,0,0.8), 0 0 64px rgba(201,164,92,0.18);
+}
+
+/* The square full stop, drawn and sat on the baseline. */
+.gate-topmark i {
+  display: inline-block;
+  width: 0.17em;
+  height: 0.17em;
+  margin-left: 0.07em;
+  background: var(--gold);
+  vertical-align: baseline;
+}
+
+.gate-lede {
+  margin: 14px 0 34px;
+  max-width: 34ch;
+  text-align: center;
+  color: var(--text-dim);
+  font-size: 14.5px;
+  line-height: 1.55;
+  text-wrap: balance;
+}
+
+/* ── The glass card ──────────────────────────────────────────────────────── */
+.gate-card {
+  width: 100%;
+  background: rgba(16,16,16,0.42);
+  border: 1px solid rgba(255,255,255,0.22);
+  border-radius: var(--radius-lg);
+  padding: 30px 26px;
+  -webkit-backdrop-filter: blur(15px) saturate(135%);
+  backdrop-filter: blur(15px) saturate(135%);
+  box-shadow: 0 30px 70px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+.field { margin-bottom: 18px; }
+
+label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.input {
+  width: 100%;
+  color: var(--text);
+  background: #0e0e0e;
+  border: 1px solid rgba(255,255,255,0.13);
+  border-radius: var(--radius-sm);
+  padding: 11px 12px;
+  font-size: 14px;
+  font-family: var(--display);
+  transition: border-color .16s, background .16s;
+}
+.input::placeholder { color: var(--text-faint); }
+.input:focus { outline: none; border-color: var(--gold); background: #141414; }
+
+.btn {
+  width: 100%;
+  height: 52px;
+  margin-top: 26px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--gold);
+  color: #0b0b0b;
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+  transition: background .16s;
+}
+.btn:hover { background: var(--gold-soft); }
+
+.foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+.foot a { color: var(--text-dim); text-decoration: none; }
+.foot a:hover { color: var(--text); }
+.foot b { color: var(--gold); font-weight: 500; }
+
+/* Snapshot badge, so nobody mistakes this static page for the live app. */
+.snapshot-tag {
+  position: fixed;
+  bottom: 14px; left: 14px;
+  z-index: 3;
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  background: rgba(9,9,9,0.6);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 5px 9px;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-reel video { display: none; }
+  .gate-reel { background: #0b0b0b center / cover no-repeat; }
+}
+</style>
+</head>
+<body>
+
+<main class="gate">
+  <div class="gate-reel" aria-hidden="true">
+    <video src="./city-night.mp4" poster="./city-night.jpg" autoplay muted loop playsinline></video>
+  </div>
+
+  <section class="gate-form-wrap">
+    <h1 class="gate-topmark">ARCHTA<i aria-hidden="true"></i></h1>
+    <p class="gate-lede">Installment sales, allocations and collections for property developers.</p>
+
+    <form class="gate-card" onsubmit="return false">
+      <div class="field">
+        <label for="email">Email</label>
+        <input class="input" id="email" type="email" placeholder="you@company.com" autocomplete="username">
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input class="input" id="password" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn" type="submit">Sign in</button>
+      <div class="foot">
+        <a href="#">Forgot your password?</a>
+        <span>Need an account? <a href="#"><b>Create one</b></a></span>
+      </div>
+    </form>
+  </section>
+
+  <div class="snapshot-tag">Design 1 · City Night · snapshot</div>
+</main>
+
+</body>
+</html>
