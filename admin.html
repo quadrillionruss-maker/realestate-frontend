@@ -215,6 +215,13 @@
 <div class="toast-host" id="toasts"></div>
 <div id="overlay"></div>
 
+<!-- Sets window.__API_BASE__ — the one place the backend's real host is
+     hardcoded (config.js's own header). This page loads it too rather than
+     re-deriving the same answer a second, and differently, in admin.js:
+     the frontend and the API are two separate deployments (Vercel and
+     Render), so "same origin as this page" is only ever true in local dev,
+     never in production. -->
+<script src="./config.js"></script>
 <script src="./admin.js"></script>
 </body>
 </html>
