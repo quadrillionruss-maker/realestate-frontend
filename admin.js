@@ -451,7 +451,7 @@
         '<div class="table-wrap"><table class="data"><thead><tr><th>Channel</th><th>Recipient</th><th>Reason</th><th>When</th></tr></thead><tbody>' +
         (d.recent_failures.length ? d.recent_failures.map(function (f) {
           return '<tr><td>' + esc(f.channel) + '</td><td>' + esc(f.recipient || '—') + '</td>' +
-            '<td>' + esc(f.reason || '—') + '</td><td>' + timeAgo(f.created_at) + '</td></tr>';
+            '<td>' + esc(f.error || '—') + '</td><td>' + timeAgo(f.created_at) + '</td></tr>';
         }).join('') : '<tr><td colspan="4"><div class="empty">No failures recorded.</div></td></tr>') +
         '</tbody></table></div></div>';
     });
