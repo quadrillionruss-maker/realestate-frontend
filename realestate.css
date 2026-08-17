@@ -218,7 +218,11 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   padding: 56px 56px 44px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: center;
+  /* The mark and the tagline block used to be pushed to opposite ends of the
+     panel (space-between); centering them as a group needs its own gap to
+     replace that distributed space, or the two would sit flush together. */
+  gap: 48px;
   background: var(--sidebar-bg);
   overflow: hidden;
 }
@@ -286,9 +290,10 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
 
 .gate-blurb {
   font-family: var(--sans);
-  color: rgba(255, 255, 255, 0.78);
+  color: rgba(255, 255, 255, 0.85);
   max-width: 42ch;
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 500;
   line-height: 1.65;
 }
 
