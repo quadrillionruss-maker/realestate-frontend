@@ -318,15 +318,15 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
    same effect the reference poster has — with no image to ghost through. */
 .gate-floorplan {
   position: absolute;
-  right: 0; bottom: 0;
-  width: 60%;
-  height: 66%;
+  right: -30px; bottom: 42px;
+  width: 64%;
+  height: 72%;
   overflow: visible;
 }
 
 /* Section 13 — REGISTERED SYSTEM block, bottom-left, clear of the floor
    plan crop above (which starts well to its right). */
-.gate-registered { position: absolute; left: 40px; bottom: 178px; max-width: 220px; }
+.gate-registered { position: absolute; left: 40px; bottom: 128px; max-width: 220px; }
 .gate-registered-rule { height: 1px; border-top: 1px dashed rgba(230,236,242,0.3); margin-bottom: 14px; }
 .gate-registered-label {
   font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.2em;
