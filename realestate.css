@@ -626,11 +626,11 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
   box-shadow: 0 1px 3px rgba(80, 80, 160, 0.06);
 }
 
-.search { position: relative; flex: 1; max-width: 420px; transition: max-width .16s var(--ease); }
+.search { position: relative; flex: 1; max-width: 500px; transition: max-width .16s var(--ease); }
 /* "Expand slightly" on focus — a few px of breathing room past the resting
-   420px, not a jarring resize; the transition above is what makes it read
+   500px, not a jarring resize; the transition above is what makes it read
    as an expansion rather than a snap. */
-.search:focus-within { max-width: 448px; }
+.search:focus-within { max-width: 530px; }
 
 .search input {
   width: 100%;
