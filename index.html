@@ -147,51 +147,83 @@
          preserveAspectRatio="xMaxYMax slice">
       <defs>
         <style>
-          .fp-line { fill: none; stroke: rgba(150,192,220,0.32); stroke-width: 1; }
-          .fp-line-strong { fill: none; stroke: rgba(160,200,228,0.45); stroke-width: 1.3; }
-          .fp-line-faint { fill: none; stroke: rgba(150,192,220,0.18); stroke-width: 0.8; }
-          .fp-dash { fill: none; stroke: rgba(150,192,220,0.22); stroke-width: 0.8; stroke-dasharray: 5 4; }
-          .fp-label { fill: rgba(160,200,228,0.4); font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; }
+          /* Ink sampled straight from bankai.png: the drafting lines read as
+             rgb(48,104,123) at their brightest against the rgb(1,34,49) navy,
+             so the ink here is that same steel-blue at a spread of opacities
+             (brighter on primary walls, faint on setbacks and annotation). */
+          .fp-strong { fill: none; stroke: rgba(96,152,174,0.62); stroke-width: 1.4; }
+          .fp        { fill: none; stroke: rgba(96,152,174,0.42); stroke-width: 1; }
+          .fp-faint  { fill: none; stroke: rgba(96,152,174,0.24); stroke-width: 0.8; }
+          .fp-dash   { fill: none; stroke: rgba(96,152,174,0.34); stroke-width: 0.9; stroke-dasharray: 6 4; }
+          .fp-fine   { fill: none; stroke: rgba(96,152,174,0.22); stroke-width: 0.7; stroke-dasharray: 2 3; }
+          .fp-label  { fill: rgba(120,168,188,0.42); font-family: var(--mono); font-size: 12px; letter-spacing: 0.06em; }
+          .fp-num    { fill: rgba(120,168,188,0.3); font-family: var(--mono); font-size: 7px; letter-spacing: 0.04em; }
         </style>
       </defs>
-      <!-- Whole plan rotated on the poster's diagonal, pivoting off the
-           lower-right so the detail packs into that corner and thins out
-           toward the centre. -->
-      <g transform="rotate(-19 360 360)">
-        <!-- Site boundary — a long angled parcel edge running across. -->
-        <path class="fp-line-strong" d="M-40 150 L520 60" />
-        <path class="fp-dash" d="M-40 176 L520 86" />
+      <!-- The whole plan is rotated ~16 deg counter-clockwise about a
+           lower-right pivot, exactly like the reference: the parcel edge and
+           every building tilt up toward the right, detail packs into the
+           bottom-right corner and thins toward the empty centre-left where
+           the headline sits. Everything bleeds off the right and bottom
+           edges (preserveAspectRatio slice) so it reads as a fragment. -->
+      <g transform="rotate(-16 340 340)">
 
-        <!-- Top band of narrow plots along the boundary. -->
-        <path class="fp-line" d="M40 168 L40 232 L120 222 L118 158 Z" />
-        <path class="fp-line" d="M120 222 L118 158 L206 150 L210 214 Z" />
-        <path class="fp-line" d="M210 214 L206 150 L300 144 L306 208 Z" />
-        <path class="fp-line" d="M306 208 L300 144 L392 138 L400 202 Z" />
-        <path class="fp-line" d="M400 202 L392 138 L486 132 L496 196 Z" />
+        <!-- Parcel boundary + right-of-way running across the top. -->
+        <path class="fp-strong" d="M-60 152 L560 152" />
+        <path class="fp-dash"   d="M-60 170 L560 170" />
+        <path class="fp-fine"   d="M120 116 L560 116" />
 
-        <!-- Main building block, larger footprint with interior rooms. -->
-        <rect class="fp-line-strong" x="120" y="270" width="200" height="150" />
-        <path class="fp-line" d="M120 320 L320 320" />
-        <path class="fp-line" d="M186 270 L186 420" />
-        <path class="fp-line" d="M253 320 L253 420" />
-        <path class="fp-line-faint" d="M186 356 L253 356" />
-        <text class="fp-label" x="132" y="312">82</text>
+        <!-- Band of narrow subdivided plots hanging off the boundary. -->
+        <path class="fp" d="M60 172 L60 224 M148 172 L148 224 M236 172 L236 224 M324 172 L324 224 M412 172 L412 224 M500 172 L500 224" />
+        <path class="fp-faint" d="M60 224 L560 224" />
+        <path class="fp-fine"  d="M104 176 L104 220 M192 176 L192 220 M280 176 L280 220 M368 176 L368 220 M456 176 L456 220" />
 
-        <!-- Second block to the right, subdivided. -->
-        <rect class="fp-line-strong" x="346" y="256" width="132" height="176" />
-        <path class="fp-line" d="M346 330 L478 330" />
-        <path class="fp-line" d="M412 256 L412 432" />
-        <text class="fp-label" x="392" y="300">AQ</text>
+        <!-- Main block "82": large footprint, interior room grid + setback. -->
+        <rect class="fp-strong" x="150" y="258" width="156" height="126" />
+        <rect class="fp-fine"   x="158" y="266" width="140" height="110" />
+        <path class="fp" d="M228 258 L228 384 M150 322 L306 322" />
+        <path class="fp-faint" d="M228 290 L306 290 M189 322 L189 384" />
+        <text class="fp-label" x="205" y="328">82</text>
+        <text class="fp-num" x="160" y="252" transform="rotate(-90 160 252)">12.50</text>
 
-        <!-- Lower plots. -->
-        <rect class="fp-line" x="150" y="446" width="120" height="70" />
-        <path class="fp-line-faint" d="M210 446 L210 516" />
-        <text class="fp-label" x="162" y="484">82</text>
+        <!-- Right block "AQ": subdivided grid. -->
+        <rect class="fp-strong" x="338" y="230" width="122" height="132" />
+        <rect class="fp-fine"   x="346" y="238" width="106" height="116" />
+        <path class="fp" d="M399 230 L399 362 M338 296 L460 296" />
+        <path class="fp-faint" d="M399 264 L460 264 M368 296 L368 362" />
+        <text class="fp-label" x="375" y="292">AQ</text>
 
-        <!-- Dimension leaders threading between the blocks. -->
-        <path class="fp-dash" d="M320 344 L346 344" />
-        <path class="fp-line-faint" d="M120 440 L478 452" />
-        <path class="fp-line-faint" d="M60 250 L60 470" />
+        <!-- Lower-right block "81". -->
+        <rect class="fp-strong" x="356" y="392" width="120" height="96" />
+        <path class="fp" d="M416 392 L416 488 M356 440 L476 440" />
+        <path class="fp-faint" d="M416 416 L476 416" />
+        <text class="fp-label" x="392" y="446">81</text>
+
+        <!-- Lower-centre block "82". -->
+        <rect class="fp" x="178" y="404" width="112" height="86" />
+        <path class="fp-faint" d="M234 404 L234 490 M178 447 L290 447" />
+        <text class="fp-label" x="215" y="452">82</text>
+
+        <!-- Small "C" plot on the left, inside an angled parcel. -->
+        <path class="fp-dash" d="M40 300 L150 288 L162 372 L52 386 Z" />
+        <rect class="fp" x="74" y="322" width="42" height="40" />
+        <text class="fp-label" x="88" y="348">C</text>
+
+        <!-- Far-right stacked plots bleeding off the edge. -->
+        <rect class="fp" x="486" y="250" width="80" height="42" />
+        <rect class="fp" x="486" y="300" width="80" height="48" />
+        <rect class="fp-faint" x="486" y="360" width="80" height="44" />
+        <path class="fp-faint" d="M520 250 L520 404" />
+
+        <!-- Dimension leaders threading between the blocks, with end ticks. -->
+        <path class="fp-dash" d="M306 300 L338 296" />
+        <path class="fp-faint" d="M60 250 L60 470 M56 250 L64 250 M56 470 L64 470" />
+        <path class="fp-faint" d="M150 502 L476 514 M150 498 L150 506 M476 510 L476 518" />
+        <text class="fp-num" x="252" y="242">8.40</text>
+        <text class="fp-num" x="126" y="472" transform="rotate(-90 126 472)">24.0</text>
+
+        <!-- Secondary parcel edge sweeping off the lower-left. -->
+        <path class="fp-dash" d="M-60 428 L210 356" />
       </g>
     </svg>
 
