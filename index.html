@@ -132,25 +132,68 @@
       <line x1="-5" y1="18" x2="41" y2="18" stroke="rgba(230,236,242,0.4)" stroke-width="1"/>
     </svg>
 
-    <!-- Section 7-9 — the floor plan, composited from bankai.png's own
-         lower-right region (archta_exact_reference.svg and
-         archta_blueprint_background.png, the two earlier reference assets,
-         are gone from frontend/ — bankai.png is the only one left, so it is
-         now this layer's image source too). right:0;bottom:0 with a fixed
-         width/height keeps it anchored to the lower-right corner (bleeding
-         off both edges, same as the reference) while preserving the large
-         center-left negative space (section 14). overflow:hidden on the
-         wrapper is the crop; object-fit:cover + transform:scale on the
-         image itself is what zooms into the source's own lower-right
-         (where its floor-plan detail concentrates, not the logo/coordinate
-         text near its top) without distorting it — object-fit alone
-         establishes an aspect-correct base fit for ANY container shape,
-         and a uniform transform:scale from a corner origin only ever
-         zooms, never stretches one axis independently of the other (the
-         one hard requirement in the brief). -->
-    <div class="gate-floorplan-crop" aria-hidden="true">
-      <img class="gate-floorplan-img" src="./bankai.png" alt="">
-    </div>
+    <!-- Section 7-9 — the floor plan. THIRD approach: drawn as real vector
+         linework instead of compositing bankai.png. Every earlier version
+         cropped-and-zoomed the full poster image, which unavoidably dragged
+         the poster's OWN centred headline/blurb/scale-bar into frame as
+         ghost text no matter how tight the crop got. There is nothing to
+         ghost here — this is an actual blueprint site-plan (angled plot
+         boundaries, building footprints with interior subdivisions,
+         dimension leaders and faint plot numbers) drawn straight into the
+         lower-right corner in the same drafting-blue as the rest of the
+         panel, bleeding off both edges exactly as the reference does, and
+         kept clear of the centre-left negative space the headline occupies. -->
+    <svg class="gate-floorplan" viewBox="0 0 480 480" aria-hidden="true"
+         preserveAspectRatio="xMaxYMax slice">
+      <defs>
+        <style>
+          .fp-line { fill: none; stroke: rgba(150,192,220,0.32); stroke-width: 1; }
+          .fp-line-strong { fill: none; stroke: rgba(160,200,228,0.45); stroke-width: 1.3; }
+          .fp-line-faint { fill: none; stroke: rgba(150,192,220,0.18); stroke-width: 0.8; }
+          .fp-dash { fill: none; stroke: rgba(150,192,220,0.22); stroke-width: 0.8; stroke-dasharray: 5 4; }
+          .fp-label { fill: rgba(160,200,228,0.4); font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; }
+        </style>
+      </defs>
+      <!-- Whole plan rotated on the poster's diagonal, pivoting off the
+           lower-right so the detail packs into that corner and thins out
+           toward the centre. -->
+      <g transform="rotate(-19 360 360)">
+        <!-- Site boundary — a long angled parcel edge running across. -->
+        <path class="fp-line-strong" d="M-40 150 L520 60" />
+        <path class="fp-dash" d="M-40 176 L520 86" />
+
+        <!-- Top band of narrow plots along the boundary. -->
+        <path class="fp-line" d="M40 168 L40 232 L120 222 L118 158 Z" />
+        <path class="fp-line" d="M120 222 L118 158 L206 150 L210 214 Z" />
+        <path class="fp-line" d="M210 214 L206 150 L300 144 L306 208 Z" />
+        <path class="fp-line" d="M306 208 L300 144 L392 138 L400 202 Z" />
+        <path class="fp-line" d="M400 202 L392 138 L486 132 L496 196 Z" />
+
+        <!-- Main building block, larger footprint with interior rooms. -->
+        <rect class="fp-line-strong" x="120" y="270" width="200" height="150" />
+        <path class="fp-line" d="M120 320 L320 320" />
+        <path class="fp-line" d="M186 270 L186 420" />
+        <path class="fp-line" d="M253 320 L253 420" />
+        <path class="fp-line-faint" d="M186 356 L253 356" />
+        <text class="fp-label" x="132" y="312">82</text>
+
+        <!-- Second block to the right, subdivided. -->
+        <rect class="fp-line-strong" x="346" y="256" width="132" height="176" />
+        <path class="fp-line" d="M346 330 L478 330" />
+        <path class="fp-line" d="M412 256 L412 432" />
+        <text class="fp-label" x="392" y="300">AQ</text>
+
+        <!-- Lower plots. -->
+        <rect class="fp-line" x="150" y="446" width="120" height="70" />
+        <path class="fp-line-faint" d="M210 446 L210 516" />
+        <text class="fp-label" x="162" y="484">82</text>
+
+        <!-- Dimension leaders threading between the blocks. -->
+        <path class="fp-dash" d="M320 344 L346 344" />
+        <path class="fp-line-faint" d="M120 440 L478 452" />
+        <path class="fp-line-faint" d="M60 250 L60 470" />
+      </g>
+    </svg>
 
     <!-- Section 13 — REGISTERED SYSTEM block, well clear of the floor plan
          crop above (which starts partway down and across, not from this
