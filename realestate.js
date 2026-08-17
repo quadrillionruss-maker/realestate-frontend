@@ -2180,5 +2180,26 @@
     done: endWhatsappQueue,
   };
 
+  // Registered unconditionally (cheap, and every role benefits from the
+  // app-shell speed-up); which SCREENS actually use what it caches is gated
+  // to sales_rep inside screens.js and offline-queue.js instead. Guarded by
+  // the feature check itself — an old browser or a locked-down webview with
+  // no serviceWorker support must not throw and take anything else down
+  // with it. Was a bare inline <script> in index.html; moved here so
+  // frontend/vercel.json's CSP never has to carry a per-script hash — this
+  // file's own convention (CLAUDE.md's frontend gotchas) is that nothing
+  // here is ever inline. Wrapped like every other top-level window.* call in
+  // this file: the minimal window stub logic.test.js requires this file
+  // against has no addEventListener.
+  try {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('./service-worker.js').catch(function (err) {
+          console.warn('[archta] service worker registration failed:', err.message);
+        });
+      });
+    }
+  } catch (e) { /* no-op outside a real browser */ }
+
   document.addEventListener('DOMContentLoaded', boot);
 })();

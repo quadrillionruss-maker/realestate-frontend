@@ -337,20 +337,5 @@
 <script src="./realestate.js"></script>
 <script src="./offline-queue.js"></script>
 <script src="./screens.js"></script>
-<script>
-  // SECTION 14 — registered unconditionally (cheap, and every role benefits
-  // from the app-shell speed-up); which SCREENS actually use what it caches
-  // is gated to sales_rep inside screens.js and offline-queue.js instead.
-  // Guarded by the feature check itself, the standard pattern — an old
-  // browser or a locked-down webview with no serviceWorker support must not
-  // throw and take the rest of this inline block down with it.
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('./service-worker.js').catch(function (err) {
-        console.warn('[archta] service worker registration failed:', err.message);
-      });
-    });
-  }
-</script>
 </body>
 </html>
