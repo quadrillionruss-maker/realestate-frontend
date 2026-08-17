@@ -1932,9 +1932,12 @@
     dismissPushBanner: dismissPushBanner,
     subscribeToPush: subscribeToPush,
     refreshNotifBell: refreshNotifBell,
-
-    // SECTION 15
-    whatsappQueue: whatsappQueue,
+    // SECTION 15 — whatsappQueue itself isn't assigned until near the
+    // bottom of this file; wired onto RE there instead of here, since
+    // capturing the bare (still-undefined, var-hoisted) variable at this
+    // point in the script would freeze RE.whatsappQueue at undefined
+    // forever — object literals copy the value at construction time, not a
+    // live binding to the variable.
   };
 
   // ── SECTION 1 — push notifications ───────────────────────────────────────
@@ -2179,6 +2182,7 @@
     skip: skipWhatsappQueueItem,
     done: endWhatsappQueue,
   };
+  RE.whatsappQueue = whatsappQueue;
 
   // Registered unconditionally (cheap, and every role benefits from the
   // app-shell speed-up); which SCREENS actually use what it caches is gated
