@@ -220,13 +220,23 @@ button { cursor: pointer; background: none; border: none; padding: 0; }
    reference image element-by-element across several rounds. sup.png is
    that composition already finished — headline and blurb baked into the
    pixels — so the panel is now just that one image, full-bleed. Nothing
-   here is recreated in CSS or SVG; background-size:cover fills the panel
-   at any viewport without distorting it, background-position:center keeps
-   the same crop point (the logo/headline column, left-of-center in the
-   source) as the panel's aspect ratio changes. var(--sidebar-bg) stays as
-   the color underneath in case the image fails to load. */
+   here is recreated in CSS or SVG.
+
+   background-size:contain, not cover: sup.png is 1141x1379 (0.83:1,
+   noticeably taller/narrower than the panel, which runs close to 1:1 at
+   most desktop widths — .gate gives this section 1.15 of 2fr, and with
+   height pinned to the full viewport that ratio is roughly (0.575 *
+   window width) : window height, ~0.92:1 at 16:10 and ~1.02:1 at 16:9).
+   cover would scale up until the image's width fills the panel and crop
+   the overflow off the top and bottom — exactly the "logo/scale-bar cut
+   off" failure the very first version of this panel had, just via the
+   raster image instead of a mis-set preserveAspectRatio. contain guarantees
+   the whole composition is always on screen; var(--sidebar-bg) shows
+   through the top/bottom letterbox strips contain leaves at 16:9 widths
+   (close enough to the image's own navy not to read as a seam) and behind
+   the image entirely if it fails to load. */
 .gate-brand {
-  background: var(--sidebar-bg) url('./sup.png') center / cover no-repeat;
+  background: var(--sidebar-bg) url('./sup.png') center / contain no-repeat;
 }
 
 /* Three statements about behaviour, replacing what used to be three numbers
