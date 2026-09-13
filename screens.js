@@ -15,6 +15,44 @@
  * meant it was a read-only dashboard for anyone who was not its author, and
  * the smoke test was the only thing that had ever created a reservation.
  * Everything below exists to close that gap.
+ *
+ * ── TABLE OF CONTENTS ─────────────────────────────────────────────────────
+ * This file is long (8,700+ lines) and not going to be split — a refactor
+ * of that size carries its own regression risk, for a navigation problem a
+ * table of contents already solves. Line numbers below are AS OF THIS
+ * COMMENT and will drift as the file is edited; if a range looks wrong,
+ * search for the `R.screens.<name> = {` (or `R.screens['<name>'] = {`)
+ * assignment named on that row instead — each screen is exactly one such
+ * assignment, so that search always lands you at the real start.
+ *
+ *   Lines        Screen (nav label)                  R.screens key
+ *   -----------  -----------------------------------  ----------------
+ *   58–611       (shared render helpers, no screen — esc/naira/card/
+ *                stat/table/modal-body builders every screen below uses)
+ *   612–1358     Dashboard (Command Center)            dashboard
+ *   1359–1383    At risk                                'at-risk'
+ *   1384–1456    Tasks                                  tasks
+ *   1457–1553    Log Book (includes Attendance —        logs
+ *                LOG_ENTRY_TYPES; attendance has no
+ *                separate screen of its own)
+ *   1554–2073    Projects (includes Community —         projects
+ *                openCommunityModerationModal is a
+ *                per-project modal here, not its own
+ *                screen; the buyer-facing forum itself
+ *                lives in portal.js)
+ *   2074–2673    Units                                  units
+ *   2674–3877    Buyers                                 customers
+ *   3878–4126    Reservations                            reservations
+ *   4127–4998    Campaigns                                campaigns
+ *   4999–5614    Payments                                 payments
+ *   5615–5852    Documents                                documents
+ *   5853–5959    Group dashboard                          group
+ *   5960–6559    Commissions                              commissions
+ *   6560–6608    Approvals                                approvals
+ *   6609–7172    Reports (includes Reconciliation — a     reports
+ *                card within this screen, not its own;
+ *                see reconciliationCard() nearby)
+ *   7173–8782    Settings                                 settings
  */
 (function () {
   'use strict';
@@ -1107,8 +1145,11 @@
     return '<div class="record">' +
       // Clicking anywhere in the top row (name, meta, or amount) opens the
       // buyer — no separate "Open" button competing with Call/WhatsApp/Log a
-      // promise for space in record-actions below.
-      '<div class="record-top is-clickable" data-buyer="' + esc(c.customer.id) + '">' +
+      // promise for space in record-actions below. Same guard as the brief's
+      // own numbered risk list just above: omit data-buyer entirely rather
+      // than render it empty when c.customer.id is missing, so a click here
+      // can never fire openCustomer('') and 500 the buyer drawer's fetches.
+      '<div class="record-top' + (c.customer.id ? ' is-clickable" data-buyer="' + esc(c.customer.id) : '') + '">' +
         '<div><div class="record-name">' + esc(c.customer.full_name) + '</div>' +
         '<div class="record-meta">' + meta + '</div></div>' +
         '<div class="record-amount">' + naira(c.overdue_amount) + '</div>' +
@@ -3874,9 +3915,9 @@
             var customer = r.re_customers;
             return '<tr>' +
               '<td class="cell-primary">' +
-                (customer
+                (customer && customer.id
                   ? '<span class="name-link" data-open-buyer="' + esc(customer.id) + '">' + esc(customer.full_name) + '</span>'
-                  : '—') +
+                  : esc((customer && customer.full_name) || '—')) +
                 '<div class="cell-meta">' + esc((customer && customer.phone) || '') + '</div></td>' +
               '<td>' + esc(unit.unit_number || '—') +
                 '<div class="cell-meta">' + esc((unit.re_projects && unit.re_projects.name) || '') + '</div></td>' +
